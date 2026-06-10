@@ -1,0 +1,8 @@
+{
+  "name": "agens-card-bot",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "playwright": "^1.60.0"
+  }
+}

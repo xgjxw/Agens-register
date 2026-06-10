@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Agens 发卡机",
+  "version": "0.1.0",
+  "description": "自动注册 Agnes 账号、提取验证码、创建 API Key 并导出结果。",
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://tempmail.ing/*",
+    "https://platform.agnes-ai.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Agens 发卡机",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://tempmail.ing/*"
+      ],
+      "js": [
+        "content/tempmail.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://platform.agnes-ai.com/*"
+      ],
+      "js": [
+        "content/agnes.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
