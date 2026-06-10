@@ -1,20 +1,21 @@
-# Agens 发卡机 Chrome 插件
+# Agens Register Chrome Extension
 
-## 当前能力
+用于自动完成 Agnes 平台注册、验证码收取、API Key 创建与待导出管理的 Chrome 插件。
 
-- 支持配置循环次数
-- 自动打开 TempMail 和 Agnes 页面
-- 从 TempMail 读取临时邮箱
-- 在 Agnes 页面触发发送验证码
-- 轮询 TempMail 提取验证码
-- 回填验证码和密码完成注册
-- 创建 API Key
-- 成功结果先缓存到待导出队列
-- 插件内表格展示待导出 key
+## 功能概览
+
+- 多轮循环注册
+- 每轮强制重开 TempMail / Agnes 页面，降低旧状态污染
+- TempMail 临时邮箱自动更换
+- 自动触发 Agnes 验证码发送
+- 自动轮询并提取验证码
+- 自动回填验证码与密码完成注册
+- 自动创建 API Key
+- API Key 先缓存到待导出队列
+- Popup 表格展示待导出 Key
 - 一键导出后自动从表格移除
-- 支持停止任务、失败计数控制、单轮重试
 
-## 当前目录结构
+## 目录结构
 
 - `manifest.json`
 - `background.js`
@@ -24,34 +25,81 @@
 - `popup.css`
 - `popup.js`
 - `Agens插件流程图.md`
+- `scripts/debug-extension.js`
 
-## 安装方式
+## 安装
 
 1. 打开 Chrome
 2. 进入 `chrome://extensions/`
-3. 打开“开发者模式”
-4. 选择“加载已解压的扩展程序”
-5. 选择当前目录 `D:\workspace\myself\Agens发卡机`
+3. 开启“开发者模式”
+4. 点击“加载已解压的扩展程序”
+5. 选择当前目录
 
-## 使用方式
+## 使用
 
-1. 在插件弹窗中配置：
-   - 循环次数
-   - 固定密码
-   - 失败是否计数
-   - 单轮最大重试次数
-   - 验证码超时
-   - 轮询间隔
-   - 导出文件名
+### 配置项
+
+- `循环次数`
+- `固定密码`
+- `失败是否计数`
+- `单轮最大重试`
+- `验证码超时(ms)`
+- `轮询间隔(ms)`
+- `导出文件名`
+
+### 运行流程
+
+1. 在 Popup 中保存配置
 2. 点击“开始”
-3. 插件会自动执行多轮注册和发卡
-4. 成功生成的 key 会先进入 popup 里的“待导出 Key”表格
-5. 点击“一键导出”后，导出文件通过 Chrome 下载能力保存到浏览器下载目录
-6. 导出成功后，这批 key 会从表格中移除
+3. 插件执行注册、收码、建 Key
+4. 成功生成的 Key 进入“待导出 Key”表格
+5. 点击“一键导出”
+6. 浏览器下载导出文件
+7. 导出成功后，已导出的 Key 从表格中移除
 
-## 注意
+## 导出字段
 
-- 这是首版通用 DOM 自动化骨架。
-- Agnes 页面具体字段、注册页跳转方式、API Key 页面结构如果和当前脚本假设不同，需要再按真实 DOM 微调。
-- 当前导出是下载到浏览器默认下载目录，不是直接写工作区文件。
-- 如果首次运行报 `Receiving end does not exist`，先点扩展页的“重新加载”，然后关闭并重新打开 TempMail / Agnes 标签页再试。
+- `round`
+- `email`
+- `password`
+- `apiKey`
+- `status`
+- `createdAt`
+- `error`
+
+## 当前实现说明
+
+- 采用 DOM 自动化方案，不是直接调用 Agnes 官方接口
+- TempMail 侧已针对旧邮箱、旧弹窗、旧验证码状态做隔离处理
+- Agnes 侧已支持注册、创建 Key、读取 `sk-...`、确认弹窗
+- 导出目标是浏览器默认下载目录，不直接写工作区文件
+
+## 调试
+
+如遇扩展通信问题：
+
+1. 打开 `chrome://extensions/`
+2. 重新加载扩展
+3. 关闭现有 TempMail / Agnes 标签页
+4. 重新执行流程
+
+本仓库包含一个本地调试脚本：
+
+- `scripts/debug-extension.js`
+
+## 开发
+
+安装依赖：
+
+```bash
+npm install
+```
+
+本地语法检查可直接使用：
+
+```bash
+node --check background.js
+node --check popup.js
+node --check content/tempmail.js
+node --check content/agnes.js
+```
