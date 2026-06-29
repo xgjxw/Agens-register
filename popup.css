@@ -1,6 +1,10 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: "Microsoft YaHei", sans-serif;
+  font-family: "Microsoft YaHei", system-ui, sans-serif;
   background: #0b1020;
   color: #f3f6ff;
 }
@@ -8,19 +12,69 @@ body {
 .app {
   width: 620px;
   padding: 16px;
-  box-sizing: border-box;
+}
+
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 20px;
+}
+
 h2 {
-  margin: 0 0 12px;
-  font-size: 18px;
+  font-size: 17px;
+}
+
+.app-header p {
+  margin-top: 6px;
+  color: #92a0c5;
+  font-size: 12px;
+}
+
+.run-badge,
+.badge {
+  min-width: 48px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: #1a2442;
+  color: #aeb9da;
+  border: 1px solid #2c3657;
+}
+
+.run-badge.running {
+  color: #dfffea;
+  background: #126b3a;
+  border-color: #23a55a;
+}
+
+.run-badge.stopping {
+  color: #fff5db;
+  background: #7a4b08;
+  border-color: #d99b18;
 }
 
 .panel,
 .actions,
 .status,
-.queue {
+.queue,
+.advanced {
   margin-bottom: 14px;
 }
 
@@ -30,26 +84,53 @@ h2 {
   gap: 10px;
 }
 
+.wide {
+  grid-column: 1 / -1;
+}
+
 label {
   display: grid;
   gap: 6px;
 }
 
-label span {
+label span,
+.advanced summary {
   font-size: 12px;
   color: #b7c0d8;
 }
 
 input,
 select,
-button,
-textarea {
+button {
+  width: 100%;
   border: 1px solid #2d3655;
   border-radius: 8px;
   background: #111935;
   color: #f3f6ff;
   padding: 10px 12px;
-  box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+button:focus {
+  outline: 2px solid rgba(85, 126, 255, 0.45);
+  outline-offset: 1px;
+}
+
+.advanced {
+  border: 1px solid #202a49;
+  border-radius: 10px;
+  background: rgba(17, 25, 53, 0.45);
+}
+
+.advanced summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  user-select: none;
+}
+
+.advanced .panel {
+  padding: 0 12px 12px;
 }
 
 .actions {
@@ -61,18 +142,83 @@ textarea {
 button {
   cursor: pointer;
   font-weight: 700;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
 }
 
-.primary {
-  background: #2253ff;
+button:active {
+  transform: translateY(1px);
 }
 
-.secondary {
+.action-btn,
+.ghost {
   background: #182445;
+  color: #d7def6;
 }
 
-.danger {
+.action-btn.start.active {
+  background: #2253ff;
+  border-color: #4a73ff;
+  color: #fff;
+}
+
+.action-btn.stop.active {
   background: #c92a2a;
+  border-color: #f05252;
+  color: #fff;
+}
+
+.action-btn.export.active {
+  background: #1c7c54;
+  border-color: #31b77c;
+  color: #fff;
+}
+
+.action-btn.refresh.active {
+  background: #5b3fd6;
+  border-color: #8068ff;
+  color: #fff;
+}
+
+.section-title,
+.queue-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+#progressText {
+  color: #92a0c5;
+  font-size: 12px;
+}
+
+.status-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.status-card {
+  background: #111935;
+  border: 1px solid #2d3655;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 0;
+}
+
+.status-card .label {
+  color: #92a0c5;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.status-card .value {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 pre {
@@ -83,29 +229,11 @@ pre {
   border: 1px solid #2d3655;
   border-radius: 8px;
   padding: 12px;
-  min-height: 160px;
+  min-height: 96px;
+  max-height: 180px;
+  overflow: auto;
   font-size: 12px;
-  line-height: 1.5;
-}
-
-.queue-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.badge {
-  min-width: 24px;
-  height: 24px;
-  padding: 0 8px;
-  border-radius: 999px;
-  background: #2253ff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
+  line-height: 1.55;
 }
 
 .table-wrap {
@@ -113,7 +241,7 @@ pre {
   border-radius: 8px;
   overflow: hidden;
   background: #111935;
-  max-height: 260px;
+  max-height: 230px;
   overflow-y: auto;
 }
 

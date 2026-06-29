@@ -1,13 +1,14 @@
 # Agens Register Chrome Extension
 
-用于自动完成 Agnes 平台注册、验证码收取、API Key 创建与待导出管理的 Chrome 插件。
+用于自动完成 Agnes / RedFox 平台注册、验证码收取、API Key 创建与待导出管理的 Chrome 插件。
 
 ## 功能概览
 
 - 多轮循环注册
-- 每轮强制重开 TempMail / Agnes 页面，降低旧状态污染
+- 支持 Agnes 发卡 / RedFox 发卡类型切换
+- 每轮强制重开 TempMail / 目标平台开户页面，降低旧状态污染
 - TempMail 临时邮箱自动更换
-- 自动触发 Agnes 验证码发送
+- 自动触发目标平台验证码发送
 - 自动轮询并提取验证码
 - 自动回填验证码与密码完成注册
 - 自动创建 API Key
@@ -21,6 +22,7 @@
 - `background.js`
 - `content/tempmail.js`
 - `content/agnes.js`
+- `content/redfox.js`
 - `popup.html`
 - `popup.css`
 - `popup.js`
@@ -40,6 +42,7 @@
 ### 配置项
 
 - `循环次数`
+- `发卡类型`
 - `固定密码`
 - `失败是否计数`
 - `单轮最大重试`
@@ -60,6 +63,7 @@
 ## 导出字段
 
 - `round`
+- `targetType`
 - `email`
 - `password`
 - `apiKey`
@@ -69,9 +73,10 @@
 
 ## 当前实现说明
 
-- 采用 DOM 自动化方案，不是直接调用 Agnes 官方接口
+- 采用 DOM 自动化方案，不是直接调用平台官网接口
 - TempMail 侧已针对旧邮箱、旧弹窗、旧验证码状态做隔离处理
 - Agnes 侧已支持注册、创建 Key、读取 `sk-...`、确认弹窗
+- RedFox 侧已支持注册、创建密钥、读取 `ak_...`、确认保存弹窗
 - 导出目标是浏览器默认下载目录，不直接写工作区文件
 
 ## 调试
@@ -80,7 +85,7 @@
 
 1. 打开 `chrome://extensions/`
 2. 重新加载扩展
-3. 关闭现有 TempMail / Agnes 标签页
+3. 关闭现有 TempMail / Agnes / RedFox 标签页
 4. 重新执行流程
 
 本仓库包含一个本地调试脚本：

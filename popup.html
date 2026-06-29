@@ -8,57 +8,82 @@
   </head>
   <body>
     <main class="app">
-      <h1>Agens 发卡机</h1>
+      <header class="app-header">
+        <div>
+          <h1>Agens 发卡机</h1>
+          <p>自动注册、收码、创建 Key，并写入本地总表。</p>
+        </div>
+        <span id="runBadge" class="run-badge idle">空闲</span>
+      </header>
 
-      <section class="panel">
+      <section class="panel main-config">
+        <label>
+          <span>发卡类型</span>
+          <select id="targetType">
+            <option value="agnes">Agens 发卡</option>
+            <option value="redfox">RedFox 发卡</option>
+          </select>
+        </label>
+
         <label>
           <span>循环次数</span>
           <input id="loopCount" type="number" min="1" max="9999" />
         </label>
 
-        <label>
+        <label class="wide">
           <span>固定密码</span>
           <input id="fixedPassword" type="text" />
         </label>
-
-        <label>
-          <span>失败是否计数</span>
-          <select id="countFailedAttempt">
-            <option value="true">计入</option>
-            <option value="false">不计入</option>
-          </select>
-        </label>
-
-        <label>
-          <span>单轮最大重试</span>
-          <input id="maxRetryPerRound" type="number" min="1" max="20" />
-        </label>
-
-        <label>
-          <span>验证码超时(ms)</span>
-          <input id="codeTimeoutMs" type="number" min="10000" step="1000" />
-        </label>
-
-        <label>
-          <span>轮询间隔(ms)</span>
-          <input id="pollIntervalMs" type="number" min="1000" step="500" />
-        </label>
-
-        <label>
-          <span>导出文件名</span>
-          <input id="exportFileName" type="text" />
-        </label>
       </section>
 
+      <details class="advanced">
+        <summary>高级参数</summary>
+        <section class="panel">
+          <label>
+            <span>失败是否计数</span>
+            <select id="countFailedAttempt">
+              <option value="true">计入</option>
+              <option value="false">不计入</option>
+            </select>
+          </label>
+
+          <label>
+            <span>单轮最大重试</span>
+            <input id="maxRetryPerRound" type="number" min="1" max="20" />
+          </label>
+
+          <label>
+            <span>验证码超时(ms)</span>
+            <input id="codeTimeoutMs" type="number" min="10000" step="1000" />
+          </label>
+
+          <label>
+            <span>轮询间隔(ms)</span>
+            <input id="pollIntervalMs" type="number" min="1000" step="500" />
+          </label>
+
+          <label class="wide">
+            <span>导出文件名</span>
+            <input id="exportFileName" type="text" />
+          </label>
+
+          <button id="saveBtn" class="ghost wide" type="button">保存高级配置</button>
+        </section>
+      </details>
+
       <section class="actions">
-        <button id="saveBtn" class="secondary">保存配置</button>
-        <button id="startBtn" class="primary">开始</button>
-        <button id="stopBtn" class="danger">停止</button>
-        <button id="exportBtn" class="secondary">一键导出</button>
+        <button id="startBtn" class="action-btn start" type="button">开始</button>
+        <button id="stopBtn" class="action-btn stop" type="button">停止</button>
+        <button id="refreshCreditsBtn" class="action-btn refresh" type="button">刷新 RedFox 积分</button>
+        <button id="exportBtn" class="action-btn export" type="button">导出总表</button>
       </section>
 
       <section class="status">
-        <h2>状态</h2>
+        <div class="section-title">
+          <h2>状态</h2>
+          <span id="progressText">-</span>
+        </div>
+        <div id="statusCards" class="status-cards"></div>
         <pre id="statusText">加载中...</pre>
       </section>
 
@@ -72,14 +97,16 @@
             <thead>
               <tr>
                 <th>轮次</th>
+                <th>类型</th>
                 <th>邮箱</th>
                 <th>API Key</th>
+                <th>积分</th>
                 <th>时间</th>
               </tr>
             </thead>
             <tbody id="queueBody">
               <tr>
-                <td colspan="4" class="empty">暂无待导出数据</td>
+                <td colspan="6" class="empty">暂无待导出数据</td>
               </tr>
             </tbody>
           </table>
@@ -89,4 +116,4 @@
 
     <script src="popup.js" type="module"></script>
   </body>
-  </html>
+</html>

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- 新增发卡类型配置，支持 Agnes / RedFox 切换
+- 新增 RedFox 注册、收码、创建密钥、读取 `ak_...` API Key 流程
+- TempMail 验证码识别增加 RedFox 邮件关键词
+- 导出字段增加 `targetType`
+
 ## 0.1.1
 
 - 增加待导出 Key 队列
