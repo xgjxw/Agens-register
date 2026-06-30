@@ -1,5 +1,6 @@
 const fields = {
   targetType: document.querySelector("#targetType"),
+  tempMailProvider: document.querySelector("#tempMailProvider"),
   loopCount: document.querySelector("#loopCount"),
   fixedPassword: document.querySelector("#fixedPassword"),
   countFailedAttempt: document.querySelector("#countFailedAttempt"),
@@ -83,6 +84,7 @@ async function refresh() {
 
 function applyConfig(config) {
   fields.targetType.value = config.targetType || "agnes";
+  fields.tempMailProvider.value = normalizeTempMailProvider(config.tempMailProvider);
   fields.loopCount.value = config.loopCount ?? "";
   fields.fixedPassword.value = config.fixedPassword ?? "";
   fields.countFailedAttempt.value = String(config.countFailedAttempt);
@@ -109,6 +111,7 @@ function renderState(state) {
     `状态: ${state.running ? "运行中" : state.stopping ? "停止中" : "空闲"}`,
     `阶段: ${phase}`,
     `发卡类型: ${formatTargetType(state.targetType)}`,
+    `临时邮箱源: ${formatTempMailProvider(state.tempMailProvider)}`,
     `轮次: ${state.currentRound || 0}/${state.totalRounds || 0}`,
     `最近邮箱: ${state.lastEmail || "-"}`,
     `最近验证码: ${state.lastCode || "-"}`,
@@ -235,6 +238,14 @@ function formatTargetType(value) {
   return value === "redfox" ? "RedFox" : "Agens";
 }
 
+function normalizeTempMailProvider(value) {
+  return value === "mailCx" ? "mailCx" : "tempmailIng";
+}
+
+function formatTempMailProvider(value) {
+  return normalizeTempMailProvider(value) === "mailCx" ? "mail.cx" : "tempmail.ing";
+}
+
 function formatLocalTime(value) {
   if (!value) {
     return "-";
@@ -258,6 +269,7 @@ function escapeHtml(value) {
 function readConfigFromForm() {
   return {
     targetType: fields.targetType.value,
+    tempMailProvider: fields.tempMailProvider.value,
     loopCount: Number(fields.loopCount.value),
     fixedPassword: fields.fixedPassword.value,
     countFailedAttempt: fields.countFailedAttempt.value === "true",

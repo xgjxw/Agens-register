@@ -1,10 +1,12 @@
 const URLS = {
-  tempMail: "https://mail.cx/zh/",
+  tempMail: "https://tempmail.ing/zh-CN/",
+  mailCx: "https://mail.cx/zh/",
   agnesLogin: "https://platform.agnes-ai.com/login",
   redfoxLogin: "https://redfox.hk/login?redirect=%2Fdashboard%2Faccount"
 };
 
 const CONTENT_SCRIPT_FILES = {
+  "https://tempmail.ing": ["content/tempmail.js"],
   "https://mail.cx": ["content/tempmail.js"],
   "https://platform.agnes-ai.com": ["content/agnes.js"],
   "https://redfox.hk": ["content/redfox.js"]
@@ -12,6 +14,7 @@ const CONTENT_SCRIPT_FILES = {
 
 const DEFAULT_CONFIG = {
   targetType: "agnes",
+  tempMailProvider: "tempmailIng",
   loopCount: 1,
   fixedPassword: "Agnes#2026!Auto",
   countFailedAttempt: true,
@@ -100,10 +103,16 @@ async function getCombinedState() {
 
   const { config = DEFAULT_CONFIG } = await chrome.storage.local.get("config");
   return {
-    config,
+    config: {
+      ...DEFAULT_CONFIG,
+      ...config,
+      targetType: normalizeTargetType(config.targetType || DEFAULT_CONFIG.targetType),
+      tempMailProvider: normalizeTempMailProvider(config.tempMailProvider || DEFAULT_CONFIG.tempMailProvider)
+    },
     state: {
       ...runState,
-      targetType: runState.targetType || config.targetType || DEFAULT_CONFIG.targetType
+      targetType: runState.targetType || config.targetType || DEFAULT_CONFIG.targetType,
+      tempMailProvider: runState.tempMailProvider || config.tempMailProvider || DEFAULT_CONFIG.tempMailProvider
     }
   };
 }
@@ -140,6 +149,7 @@ async function startRun(overrideConfig = {}) {
     stopping: false,
     startedAt: new Date().toISOString(),
     targetType: mergedConfig.targetType,
+    tempMailProvider: mergedConfig.tempMailProvider,
     currentRound: 0,
     totalRounds: mergedConfig.loopCount,
     successCount: 0,
@@ -266,7 +276,7 @@ async function doAgnesRound(round, attempt, config) {
   runState.currentPhase = `第 ${round} 轮：准备临时邮箱`;
   await persistState();
 
-  const tempMailTab = await ensureTab(URLS.tempMail);
+  const tempMailTab = await ensureTab(getTempMailUrl(config));
   const agnesTab = await ensureTab(URLS.agnesLogin);
 
   const emailInfo = await sendTabMessage(tempMailTab.id, {
@@ -343,7 +353,7 @@ async function doRedFoxRound(round, attempt, config) {
 
   runState.currentPhase = `第 ${round} 轮：准备临时邮箱`;
   await persistState();
-  const tempMailTab = await ensureTab(URLS.tempMail);
+  const tempMailTab = await ensureTab(getTempMailUrl(config));
   const redfoxTab = await ensureTab(URLS.redfoxLogin);
   await assertRedFoxLoginPage(redfoxTab.id);
 
@@ -956,6 +966,7 @@ function escapeCsvCell(value) {
 function sanitizeConfig(input) {
   return {
     targetType: normalizeTargetType(input.targetType || DEFAULT_CONFIG.targetType),
+    tempMailProvider: normalizeTempMailProvider(input.tempMailProvider || DEFAULT_CONFIG.tempMailProvider),
     loopCount: normalizeInt(input.loopCount, DEFAULT_CONFIG.loopCount, 1, 9999),
     fixedPassword: String(input.fixedPassword || DEFAULT_CONFIG.fixedPassword).trim(),
     countFailedAttempt: Boolean(input.countFailedAttempt),
@@ -968,6 +979,14 @@ function sanitizeConfig(input) {
 
 function normalizeTargetType(value) {
   return value === "redfox" ? "redfox" : "agnes";
+}
+
+function normalizeTempMailProvider(value) {
+  return value === "mailCx" ? "mailCx" : "tempmailIng";
+}
+
+function getTempMailUrl(config) {
+  return normalizeTempMailProvider(config?.tempMailProvider) === "mailCx" ? URLS.mailCx : URLS.tempMail;
 }
 
 function normalizeInt(value, fallback, min, max) {

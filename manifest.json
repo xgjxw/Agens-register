@@ -11,6 +11,7 @@
     "downloads"
   ],
   "host_permissions": [
+    "https://tempmail.ing/*",
     "https://mail.cx/*",
     "https://platform.agnes-ai.com/*",
     "https://redfox.hk/*"
@@ -26,6 +27,7 @@
   "content_scripts": [
     {
       "matches": [
+        "https://tempmail.ing/*",
         "https://mail.cx/*"
       ],
       "js": [
